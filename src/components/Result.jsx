@@ -1,6 +1,11 @@
-function Result({ result }) {
+function Result({ photo, album, artist, price }) {
   return (
-      <h3>{result}</h3>
+    <>
+			<img src={photo}/>
+			<h3>{album}</h3>
+			<p>{artist}</p>
+			<p>{price}$</p>
+    </>
   );
 }
 
