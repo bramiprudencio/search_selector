@@ -5,7 +5,8 @@ import Result from './components/Result'
 function App() {
   const [results, setResults] = useState([]);
   const [input, setInput] = useState("");
-  const [filter, setFilter] = useState("all"); // Default filter
+  const [filter, setFilter] = useState("all");
+  const [order, setOrder] = useState("az");
 
   const api = 'https://itunes.apple.com/search?country=BO&term='
 
@@ -14,6 +15,9 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
+        setResults([]); // Clear results
+        if (order === "az") data.results.sort((a, b) => a.trackName.localeCompare(b.trackName));
+        else data.results.sort((a, b) => b.trackName.localeCompare(a.trackName));
         setResults(data.results); // Store results in state
       })
       .catch((error) => console.error("Error fetching data:", error));
@@ -38,16 +42,15 @@ function App() {
         </select>
         <button onClick={search}>Search</button>
       </div>
-      <div id="results">
-        {results.map((result, index) => (
-          <Result
-            key={index}
-            photo={result.artworkUrl100}
-            album={result.collectionName}
-            artist={result.artistName}
-            price={result.collectionPrice}
-          />
-        ))}
+      <div hidden={results.length === 0}>
+        <label htmlFor="order">Order by:</label>
+        <select id="order" value={order} onChange={(e) => setOrder(e.target.value)}>
+          <option value="az">A - Z</option>
+          <option value="za">Z - A</option>
+        </select>
+      </div>
+      <div id="results" className="results">
+        {results.map((result, index) => (<Result key={index} data={result} />))}
       </div>
     </>
   )
