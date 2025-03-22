@@ -9,6 +9,7 @@ function App() {
   const [order, setOrder] = useState("az");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAll, setIsAll] = useState(false); // Track if "All" is selected
+  const [searched, setSearched] = useState(false);
 
   const resultsPerPage = 16;
   const indexOfLastResult = currentPage * resultsPerPage;
@@ -16,8 +17,6 @@ function App() {
   const currentResults = isAll ? results : results.slice(indexOfFirstResult, indexOfLastResult);
 
   const api = 'https://itunes.apple.com/search?country=BO&limit=52&term='
-
-  let searched = false;
 
   function search() {
     fetch(`${api}${input}&media=${filter}`)
@@ -31,6 +30,7 @@ function App() {
         searched = true;
       })
       .catch((error) => console.error("Error fetching data:", error));
+    setSearched(true);
   }
 
   function orderResults(event) {
@@ -75,7 +75,7 @@ function App() {
           <option value="za">Z - A</option>
         </select>
       </div>
-      <div hidden={results.length > 0 || (results.length === 0 && searched)}>
+      <div hidden={results.length > 0 || !searched}>
         <h2>No results</h2>
       </div>
       <div id="results" className="results">
