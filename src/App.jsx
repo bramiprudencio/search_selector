@@ -7,20 +7,46 @@ function App() {
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState("all");
   const [order, setOrder] = useState("az");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isAll, setIsAll] = useState(false); // Track if "All" is selected
 
-  const api = 'https://itunes.apple.com/search?country=BO&term='
+  const resultsPerPage = 16;
+  const indexOfLastResult = currentPage * resultsPerPage;
+  const indexOfFirstResult = indexOfLastResult - resultsPerPage;
+  const currentResults = isAll ? results : results.slice(indexOfFirstResult, indexOfLastResult);
+
+  const api = 'https://itunes.apple.com/search?country=BO&limit=52&term='
+
+  let searched = false;
 
   function search() {
     fetch(`${api}${input}&media=${filter}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setResults([]); // Clear results
+        setResults([]); // Clear previous results
         if (order === "az") data.results.sort((a, b) => a.trackName.localeCompare(b.trackName));
         else data.results.sort((a, b) => b.trackName.localeCompare(a.trackName));
         setResults(data.results); // Store results in state
+        searched = true;
       })
       .catch((error) => console.error("Error fetching data:", error));
+  }
+
+  function orderResults(event) {
+    setOrder(event.target.value);
+    if (event.target.value == "az") results.sort((a, b) => a.trackName.localeCompare(b.trackName));
+    else results.sort((a, b) => b.trackName.localeCompare(a.trackName));
+  }
+
+  const showAll = () => {
+    setIsAll(true);
+    setCurrentPage(1); // Reset to first page if "All" is selected
+  };
+
+  function paginate(pageNumber) {
+    setCurrentPage(pageNumber);
+    setIsAll(false);
   }
 
   return (
@@ -44,13 +70,30 @@ function App() {
       </div>
       <div hidden={results.length === 0}>
         <label htmlFor="order">Order by:</label>
-        <select id="order" value={order} onChange={(e) => setOrder(e.target.value)}>
+        <select id="order" value={order} onChange={orderResults}>
           <option value="az">A - Z</option>
           <option value="za">Z - A</option>
         </select>
       </div>
+      <div hidden={results.length > 0 || (results.length === 0 && searched)}>
+        <h2>No results</h2>
+      </div>
       <div id="results" className="results">
-        {results.map((result, index) => (<Result key={index} data={result} />))}
+        {currentResults.map((result, index) => (<Result key={index} data={result} />))}
+      </div>
+      <div className="pagination" hidden={results.length === 0}>
+        <button onClick={showAll} className={isAll ? "active" : ""}>All</button>
+        {Array.from({ length: Math.ceil(results.length / resultsPerPage) }).map(
+          (_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={(currentPage === index + 1 && !isAll) ? "active" : ""}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
       </div>
     </>
   )

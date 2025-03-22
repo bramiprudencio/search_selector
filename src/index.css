@@ -182,3 +182,22 @@ img {
   justify-content: center; /* Centra las tarjetas */
   padding: 20px;
 }
+
+.pagination button {
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #1a1a1a;
+  color: white;
+  transition: background 0.3s;
+}
+
+.pagination button:hover {
+  background-color: #646cff;
+}
+
+.pagination .active {
+  background-color: #646cff;
+}
