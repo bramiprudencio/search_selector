@@ -27,7 +27,6 @@ function App() {
         if (order === "az") data.results.sort((a, b) => a.trackName.localeCompare(b.trackName));
         else data.results.sort((a, b) => b.trackName.localeCompare(a.trackName));
         setResults(data.results); // Store results in state
-        searched = true;
       })
       .catch((error) => console.error("Error fetching data:", error));
     setSearched(true);
